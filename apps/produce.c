@@ -1,7 +1,14 @@
 #include <xinu.h>
-//#include <prodcons.h>
+#include <prodcons.h>
 
-void producer(int count) {
+void produce(int count) {
+
+	int32 i;
+	
+	for(i =1; i <= count ; i++)
+	{
+		n = i;
+	}
 }
 
 
