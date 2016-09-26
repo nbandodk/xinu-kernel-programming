@@ -1,7 +1,0 @@
-Report
-
-Answer to Question 1 - Yes the program did produce garbage sometimes. This might be because there is no synchronization between the process and consequently the value of n could be mishandled by those process. The producer or consumer could go ahead of each other
-and there is no telling if the they are accessing the value of n as it is updated sequentially. Accessing value at a wrong time time may lead to corruption of the value and thus producing garbage.
-
-Answer to Question 2 - No, All the produced values are not being consumed. Most of the time only the highest value, i.e. the value of count is consumed and this is because producer is way ahead and finished updating the value of n and consumer consumes the last updated value
-and prints it count times.
