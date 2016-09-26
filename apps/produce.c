@@ -7,7 +7,9 @@ void produce(int count) {
 	
 	for(i =1; i <= count ; i++)
 	{
+		wait(consumed);
 		n = i;
+		signal(produced);
 	}
 }
 

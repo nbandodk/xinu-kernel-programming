@@ -7,7 +7,9 @@ void consume(int count) {
 	
 	for(i=1 ; i <= count ; i++)
 	{
+		wait(produced);
 		printf("The value of n is %d \n", n);
+		signal(consumed);
 	}
 }
 

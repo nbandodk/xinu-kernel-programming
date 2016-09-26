@@ -2,5 +2,8 @@
 extern int n; /*this is just declaration*/
 
 /*function Prototype*/
-void consume(int count);
-void produce(int count);
+void consume(int);
+void produce(int);
+
+/* Semaphore Declarations */
+extern sid32 produced, consumed;
