@@ -12,7 +12,10 @@ include Makedefs
 NODE=0
 GPORT=556${NODE}
 
-PLATFORM	=	arm-qemu
+ifndef PLATFORM
+$(error PLATFORM is not set. Edit your Makedefs file and add 'PLATFORM=arm-qemu'or 'PLATFORM=arm-bbb')
+endif
+
 ifeq ($(PLATFORM),arm-qemu)
 	PLAT_CFLAGS =  -DARM_QEMU -mcpu=arm1176jz-s -ggdb3 
 	PLAT_LOADADDR = 0x00010000
@@ -173,13 +176,13 @@ install: xinu
 	cp xinu.boot /tftpboot
 
 etags:
-	@(cd $(TOPDIR); find . -name '*.[ch]' -exec etags -a {} \;)
+	@(cd $(TOPDIR); find . -name '*.[chS]' -exec etags -a {} \;)
 
 qemu: xinu
-	qemu-system-arm -M versatilepb -m 512M -nographic -cpu arm1176  -kernel xinu.boot 
+	export QEMU_AUDIO_DRV=wav; export QEMU_WAV_PATH=$(TOPDIR)/compile/.wav.wav; qemu-system-arm -M versatilepb -m 512M -nographic -cpu arm1176 -kernel xinu.boot 
 
 qemu-gdb: xinu
-	qemu-system-arm -M versatilepb -m 512M -nographic -cpu arm1176  -kernel xinu.boot -S -gdb tcp::${GPORT}
+		export QEMU_AUDIO_DRV=wav; export QEMU_WAV_PATH=$(TOPDIR)/compile/.wav.wav;qemu-system-arm -M versatilepb -m 512M -nographic -cpu arm1176 -kernel xinu.boot -S -gdb tcp::${GPORT}
 #--------------------------------------------------------------------------------
 # Locations of source directories and exceptions (.c and .[sS] files to exclude)
 #--------------------------------------------------------------------------------
