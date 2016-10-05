@@ -9,7 +9,7 @@ future* future_alloc(int fut_flag)
 	if ((int*)f==-1)
 		return NULL;
 	
-	f->flag=future_flag;
+	f->flag=fut_flag;
 	f->state=FUTURE_EMPTY;
 	f->pid=NULL;
 	f->value=malloc(4);
