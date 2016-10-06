@@ -1,23 +1,21 @@
-#include <xinu.h>
-#include <future.h>
-#include <stdio.h>
 #include <kernel.h>
 #include <prodcons.h>
+#include <future.h>
 
-future* future_alloc(int fut_flag)
-{
-	future *f=getmem(sizeof(future));
-	if ((int*)f==-1)
-		return NULL;
-	
-	f->flag=fut_flag;
-	f->state=FUTURE_EMPTY;
-	f->pid=NULL;
-	
-	//f->value = 0;
-	//f->value=malloc(4);
+future* future_alloc(int fut_flag){
 
-	//printf("Future is allocated . Flag=%d", f->flag);
-	return f;
+  //allocate memory to future
+  future *f=getmem(sizeof(future));
+
+  //validate future reference
+  if ((int*)f == -1){
+    return NULL;
+  }
+
+  //set future values
+  f->flag = fut_flag;
+  f->state = FUTURE_EMPTY;
+  f->pid = NULL;
+
+  return f;
 }
-

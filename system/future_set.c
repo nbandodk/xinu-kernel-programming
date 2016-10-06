@@ -1,30 +1,27 @@
+#include <xinu.h>
 #include <future.h>
 #include <kernel.h>
 #include <prodcons.h>
 
-syscall future_set(future *f, int *value)
-{
-	if(f->state == FUTURE_WAITING)
-	{
-		
-		f->value = *value;
-		printf("\n Value set to %d \n", f->value);
-		f->state = FUTURE_VALID;
-		resume(f->pid);
-	}
-	
-	if(f->state == FUTURE_EMPTY)
-	{
-		f->value = *value;
-		f->state = FUTURE_VALID;
-		printf("\n Value set to %d \n", f->value);
-		return OK;
-	}
+syscall future_set(future *f, int *value){
+  if(f->state == FUTURE_WAITING){
 
-	if(f->state == FUTURE_VALID)
-	{
-		return SYSERR;
-	}
+    f->value = *value;
+    f->state = FUTURE_VALID;
+    resume(f->pid);
+  }
 
-	return OK;
+  if(f->state == FUTURE_EMPTY){
+
+    f->value = *value;
+    f->state = FUTURE_VALID;
+
+    return OK;
+  }
+
+  if(f->state == FUTURE_VALID){
+    return SYSERR;
+  }
+
+  return OK;
 }
