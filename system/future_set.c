@@ -1,4 +1,5 @@
 #include <future.h>
+#include <kernel.h>
 
 syscall future_set(future *f, int *value)
 {

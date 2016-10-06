@@ -1,7 +1,7 @@
 #include <xinu.h>
 #include <future.h>
 #include <stdio.h>
-#include <memory.h>
+#include <kernel.h>
 
 future* future_alloc(int fut_flag)
 {

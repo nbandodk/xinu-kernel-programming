@@ -1,5 +1,6 @@
 #include <xinu.h>
 #include <prodcons.h>
+#include <future.h>
 
 int n;                 //Definition for global variable 'n'
 /*Now global variable n will be on Heap so it is accessible all the processes i.e. consume and produce*/
@@ -22,7 +23,7 @@ shellcmd xsh_prodcons(int nargs, char *args[])
 	}
 	
 	if (nargs == 2 && strncmp(args[1], "--help", 7) == 0) {
-		printf("Usage: %s <count>\n\n", args[0]);
+		printf("Usage: %s <count>  OR %s -f\n\n", args[0],args[0]);
 		return 0;
 	}
 	
@@ -32,7 +33,7 @@ shellcmd xsh_prodcons(int nargs, char *args[])
 	if (nargs == 2) 
 	{
 	
-		if(strncmp(args[1], "-f")==0)
+		if(strncmp(args[1], "-f",2)==0)
 		{
 			future *f1, *f2, *f3;
 			

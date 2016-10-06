@@ -1,5 +1,6 @@
-#include <stdio.h>
+#include <xinu.h>
 #include <future.h>
+#include <kernel.h>
 
 syscall future_free(future* f)
 {

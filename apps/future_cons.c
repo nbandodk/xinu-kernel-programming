@@ -1,4 +1,6 @@
 #include <future.h>
+#include <kernel.h>
+#include <xinu.h>
 
 uint future_cons(future *fut) {
 
