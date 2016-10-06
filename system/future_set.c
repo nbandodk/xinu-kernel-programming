@@ -4,10 +4,20 @@
 
 syscall future_set(future *f, int *value)
 {
-	if(f->state == FUTURE_EMPTY || f->state == FUTURE_WAITING)
+	if(f->state == FUTURE_WAITING)
+	{
+		
+		f->value = *value;
+		printf("\n Value set to %d \n", f->value);
+		f->state = FUTURE_VALID;
+		resume(f->pid);
+	}
+	
+	if(f->state == FUTURE_EMPTY)
 	{
 		f->value = *value;
 		f->state = FUTURE_VALID;
+		printf("\n Value set to %d \n", f->value);
 		return OK;
 	}
 

@@ -5,8 +5,9 @@
 
 uint future_cons(future *fut) {
 
-  int status;
-  int *i = &fut->value;
+  int i,status;
+  
+  
   status = future_get(fut, &i);
   
   if (status < 1) {

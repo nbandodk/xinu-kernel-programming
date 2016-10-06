@@ -9,6 +9,7 @@ uint future_prod(future *fut) {
   for (i=0; i<1000; i++) {
     j += i;
   }
+  printf("\n Produced value %d \n", j);
   future_set(fut, &j);
   return OK;
 }

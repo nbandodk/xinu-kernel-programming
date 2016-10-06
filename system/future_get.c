@@ -8,6 +8,11 @@ syscall future_get(future *f, int *value)
 	{
 		f->state = FUTURE_WAITING;
 		f->pid = getpid();
+		kprintf("suspending consumer %d\n",f->pid);			
+		suspend(f->pid);		
+		
+		*value = f->value;
+		printf("\n Giving the value %d \n", value);
 		return OK;
 	}
 	
@@ -21,6 +26,7 @@ syscall future_get(future *f, int *value)
 		*value = f->value;
 		f->pid = NULL;
 		f->state = FUTURE_EMPTY;
+		printf("\n Giving the value %d \n", value);
 		return OK;
 	}
 

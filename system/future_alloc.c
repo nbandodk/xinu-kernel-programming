@@ -13,9 +13,11 @@ future* future_alloc(int fut_flag)
 	f->flag=fut_flag;
 	f->state=FUTURE_EMPTY;
 	f->pid=NULL;
+	
+	//f->value = 0;
 	//f->value=malloc(4);
 
-	printf("Future is allocated . Flag=%d", f->flag);
+	//printf("Future is allocated . Flag=%d", f->flag);
 	return f;
 }
 
