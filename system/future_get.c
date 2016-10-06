@@ -1,5 +1,6 @@
 #include <future.h>
 #include <kernel.h>
+#include <prodcons.h>
 
 syscall future_get(future *f, int *value)
 {

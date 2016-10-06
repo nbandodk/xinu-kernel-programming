@@ -1,11 +1,14 @@
 #include <future.h>
 #include <kernel.h>
 #include <xinu.h>
+#include <prodcons.h>
 
 uint future_cons(future *fut) {
 
-  int i, status;
+  int status;
+  int *i = &fut->value;
   status = future_get(fut, &i);
+  
   if (status < 1) {
     printf("future_get failed\n");
     return -1;
