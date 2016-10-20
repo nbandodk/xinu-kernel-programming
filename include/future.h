@@ -1,4 +1,5 @@
 #include <kernel.h>
+#include <my_queue.h>
 
 #ifndef _FUTURE_H_
 #define _FUTURE_H_
@@ -10,12 +11,16 @@
 
 /*modes of operation for future*/
 #define FUTURE_EXCLUSIVE 1
+#define FUTURE_SHARED 2
+#define FUTURE_QUEUE 3
 
 typedef struct futent{
 	int *value;
 	int flag;
 	int state;
 	pid32 pid;
+        queue *set_queue;
+        queue *get_queue;
 } future;
 
 /* Interface for system call*/
