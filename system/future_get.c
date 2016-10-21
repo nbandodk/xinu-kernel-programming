@@ -5,20 +5,20 @@
 
 syscall future_get(future *f, int *value){
 
-switch(f->flag){
+ switch(f->flag){
 
-  case 1:
+   case 1:
 
       if(f->state ==  FUTURE_EMPTY){
 
-      f->state = FUTURE_WAITING;
-      f->pid = getpid();
+        f->state = FUTURE_WAITING;
+        f->pid = getpid();
 
-      suspend(f->pid);
+        suspend(f->pid);
 
-      *value = f->value;
+        *value = f->value;
 
-      return OK;
+        return OK;
       }
 
       if(f->state == FUTURE_WAITING){
@@ -36,15 +36,15 @@ switch(f->flag){
 
       break;
 
-      case 2:
+   case 2:
 
       if(f->state ==  FUTURE_EMPTY){
 
         f->state = FUTURE_WAITING;
         f->pid = getpid();
-
-        suspend(f->pid);
         enq(f->get_queue, f->pid);
+        suspend(f->pid);
+        
 
         *value = f->value;
 
@@ -53,9 +53,9 @@ switch(f->flag){
 
       if(f->state == FUTURE_WAITING){
         f->pid = getpid();
-
-        suspend(f->pid);
         enq(f->get_queue, f->pid);
+        suspend(f->pid);
+        
 
         *value = f->value;
 
@@ -65,9 +65,6 @@ switch(f->flag){
       if(f->state == FUTURE_VALID){
 
         *value = f->value;
-        f->pid = NULL;
-        f->state = FUTURE_EMPTY;
-
         return OK;
       }
       break;

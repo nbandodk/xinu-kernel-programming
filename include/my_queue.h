@@ -1,3 +1,6 @@
+#ifndef _MY_QUEUE_H_
+#define _MY_QUEUE_H_
+
 
 #define Q_MAX_COUNT 20
 
@@ -13,4 +16,6 @@ int is_empty(queue *q);
 pid32 first_id(queue *q);
 syscall enq(queue *q, pid32 pid);
 pid32 deq(queue *q);
+
+#endif
 

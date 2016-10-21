@@ -11,9 +11,9 @@ syscall init_q(queue *q)
 int is_empty(queue *q)
 {
   if(q->head == q->tail)
-    return 0;
+    return 1;
   
-  return 1;
+  return 0;
 }
 
 pid32 first_id(queue *q)

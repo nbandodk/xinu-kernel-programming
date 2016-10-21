@@ -16,9 +16,8 @@ future* future_alloc(int fut_flag){
   f->flag = fut_flag;
   f->state = FUTURE_EMPTY;
   f->pid = NULL;
-  Queue setq, getq;
-  f->set_queue = init_q(setq);
-  f->get_queue = init_q(getq);
+  init_q(&f->set_queue);
+  init_q(&f->get_queue);
 
   return f;
 }

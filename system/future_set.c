@@ -8,13 +8,13 @@ syscall future_set(future *f, int *value){
   switch(f->flag){
 
       case 1:
-      case 2:
-
-      if(f->state == FUTURE_WAITING){
+      
+        if(f->state == FUTURE_WAITING){
 
         f->value = *value;
         f->state = FUTURE_VALID;
         resume(f->pid);
+        return OK;
       }
 
       if(f->state == FUTURE_EMPTY){
@@ -29,6 +29,29 @@ syscall future_set(future *f, int *value){
         return SYSERR;
       }
       break;
+      
+      case 2:
+
+        if(f->state == FUTURE_WAITING){
+
+          f->value = *value;
+          f->state = FUTURE_VALID;
+          f->pid = deq(&f->get_queue);
+          resume(f->pid);
+        }
+
+        if(f->state == FUTURE_EMPTY){
+
+          f->value = *value;
+          f->state = FUTURE_VALID;
+
+          return OK;
+        }
+
+        if(f->state == FUTURE_VALID){
+          return SYSERR;
+        }
+        break;
 
   }
   return OK;
