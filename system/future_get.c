@@ -1,13 +1,14 @@
-#include <xinu.h>
+
 #include <future.h>
-#include <kernel.h>
-#include <prodcons.h>
 
 syscall future_get(future *f, int *value){
 
- switch(f->flag){
+   intmask mask;
+   mask = disable();
 
-   case 1:
+   switch(f->flag){
+
+   case FUTURE_EXCLUSIVE:
 
       if(f->state ==  FUTURE_EMPTY){
 
@@ -15,39 +16,43 @@ syscall future_get(future *f, int *value){
         f->pid = getpid();
 
         suspend(f->pid);
-
+        resched();
+        
         *value = f->value;
-
+        
+        restore(mask);
         return OK;
       }
 
       if(f->state == FUTURE_WAITING){
+        restore(mask);
         return SYSERR;
       }
 
       if(f->state == FUTURE_VALID){
 
         *value = f->value;
-        f->pid = NULL;
-        f->state = FUTURE_EMPTY;
-
+        f->pid = getpid();
+        
+        restore(mask);
         return OK;
       }
 
       break;
 
-   case 2:
+   case FUTURE_SHARED:
 
       if(f->state ==  FUTURE_EMPTY){
 
         f->state = FUTURE_WAITING;
         f->pid = getpid();
-        enq(f->get_queue, f->pid);
+        enq(&f->get_queue, f->pid);
         suspend(f->pid);
         
 
         *value = f->value;
-
+        
+        restore(mask);
         return OK;
       }
 
@@ -58,18 +63,22 @@ syscall future_get(future *f, int *value){
         
 
         *value = f->value;
-
+        
+        restore(mask);
         return OK;
       }
 
       if(f->state == FUTURE_VALID){
 
         *value = f->value;
+        
+        restore(mask);
         return OK;
       }
       break;
 
   }
 
-return OK;
+ restore(mask);
+ return OK;
 }

@@ -1,4 +1,4 @@
-#include <kernel.h>
+#include <xinu.h>
 #include <my_queue.h>
 
 #ifndef _FUTURE_H_
@@ -28,6 +28,9 @@ future* future_alloc(int future_flags);
 syscall future_free(future*);
 syscall future_get(future*, int*);
 syscall future_set(future*, int*);
+
+uint future_prod(future *);
+uint future_cons(future *);
 
 #endif /* _FUTURE_H_ */
 
