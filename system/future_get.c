@@ -48,7 +48,7 @@ syscall future_get(future *f, int *value){
         f->pid = getpid();
         enq(&f->get_queue, f->pid);
         suspend(f->pid);
-        
+        resched();
 
         *value = f->value;
         
@@ -58,9 +58,9 @@ syscall future_get(future *f, int *value){
 
       if(f->state == FUTURE_WAITING){
         f->pid = getpid();
-        enq(f->get_queue, f->pid);
+        enq(&f->get_queue, f->pid);
         suspend(f->pid);
-        
+        resched();
 
         *value = f->value;
         

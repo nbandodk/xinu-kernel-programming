@@ -52,6 +52,7 @@ syscall future_set(future *f, int *value){
           {
             pro_id = deq(&f->get_queue);
             resume(pro_id);
+            resched();
           }
           restore(mask);
           return OK;

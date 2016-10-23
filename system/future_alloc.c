@@ -5,6 +5,8 @@ future* future_alloc(int fut_flag){
 
   intmask mask;
   mask = disable();
+  
+  kprintf("Inside allocate \n");
   //allocate memory to future
   future *f=getmem(sizeof(future));
   
@@ -24,5 +26,8 @@ future* future_alloc(int fut_flag){
   init_q(&f->get_queue);
 
   restore(mask);
+  
+  kprintf("Exiting allocate \n");
   return f;
+  
 }

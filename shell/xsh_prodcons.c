@@ -36,7 +36,7 @@ shellcmd xsh_prodcons(int nargs, char *args[]){
   if (nargs == 2){
     if(strncmp(args[1], "-f",2)==0){
       
-      
+      pid32 p1,p2,p3,p4,p5;
       /*future *f1, *f2, *f3;
       f1 = future_alloc(FUTURE_EXCLUSIVE);
       f2 = future_alloc(FUTURE_EXCLUSIVE);
@@ -52,11 +52,51 @@ shellcmd xsh_prodcons(int nargs, char *args[]){
       f_shared = future_alloc(FUTURE_SHARED);
       
       // Test FUTURE_SHARED
-      resume( create(future_cons, 1024, 20, "fcons2", 1, f_shared) );
+      
+      p1 = create(future_cons, 1024, 20, "fcons2", 1, f_shared);
+      resume(p1);
+      kprintf("Created cons %d - 1\n",p1);
+      p2 = create(future_cons, 1024, 20, "fcons3", 1, f_shared) ;
+      resume(p2);
+      kprintf("Created cons %d - 2\n",p2);
+      
+      print_queue(&f_shared->get_queue);
+      
+      p3 = create(future_cons, 1024, 20, "fcons4", 1, f_shared) ;
+      resume(p3);
+      kprintf("Created cons %d - 3\n",p3);
+      
+      print_queue(&f_shared->get_queue);
+      
+      p4 = create(future_cons, 1024, 20, "fcons5", 1, f_shared) ;
+      resume(p4);
+      kprintf("Created cons %d - 4\n",p4);
+      
+      print_queue(&f_shared->get_queue);
+      
+      p5 = create(future_prod, 1024, 20, "fprod2", 1, f_shared) ;
+      resume(p5);
+      kprintf("Created prod %d - 4\n",p5);
+      
+      print_queue(&f_shared->get_queue);
+      
+      
+      
+      /*resume( create(future_cons, 1024, 20, "fcons2", 1, f_shared) );
+      kprintf("Created cons 1\n");
       resume( create(future_cons, 1024, 20, "fcons3", 1, f_shared) );
-      resume( create(future_cons, 1024, 20, "fcons4", 1, f_shared) ); 
+      kprintf("Created cons 2\n");
+      print_queue(&f_shared->get_queue);
+      resume( create(future_cons, 1024, 20, "fcons4", 1, f_shared) );
+      kprintf("Created cons 3\n"); 
+      print_queue(&f_shared->get_queue);
       resume( create(future_cons, 1024, 20, "fcons5", 1, f_shared) );
-      resume( create(future_prod, 1024, 20, "fprod2", 1, f_shared) );
+      kprintf("Created cons 4\n");*/      
+      
+      
+      //resume( create(future_prod, 1024, 20, "fprod2", 1, f_shared) );
+      //sleep(1);
+      //print_queue(&f_shared->get_queue);
     }
     
     else{
