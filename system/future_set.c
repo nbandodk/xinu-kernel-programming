@@ -73,6 +73,53 @@ syscall future_set(future *f, int *value){
           return SYSERR;
         }
         break;
+        
+      case FUTURE_QUEUE:
+      
+        if(is_empty(&f->get_queue))
+        {
+          enq(&f->set_queue, currpid);
+          suspend(currpid);
+          resched();
+        }
+        else
+        {
+          if(f->state==2)
+          {
+              enq(&f->set_queue, currpid);
+              suspend(currpid);
+              resched();
+              f->value = *value;
+          }
+          else
+          {
+              f->value = *value;
+              kprintf("Future set: %d\n",*value);
+              f->state=2;
+              pid32 temp_pid = deq(&f->get_queue);
+              resume(temp_pid);
+              resched();
+          }
+        }
+        break;
+       
+      /*case FUTURE_QUEUE:
+      
+        if(is_empty(&f->get_queue))
+        {
+          enq(&f->set_queue, currpid);
+          suspend(currpid);
+          resched();
+        }
+        else
+        {
+          
+          f->value = *value;
+          pid32 temp_pid = deq(&f->get_queue);
+          resume(temp_pid);
+          resched();
+        }
+        break;*/
 
   }
   return OK;
