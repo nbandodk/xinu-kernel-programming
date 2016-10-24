@@ -78,29 +78,25 @@ syscall future_set(future *f, int *value){
       
         if(is_empty(&f->get_queue))
         {
+          f->value = *value;
           enq(&f->set_queue, currpid);
           suspend(currpid);
           resched();
+          
         }
         else
         {
-          if(f->state==2)
-          {
-              enq(&f->set_queue, currpid);
-              suspend(currpid);
-              resched();
+          
+          
               f->value = *value;
-          }
-          else
-          {
-              f->value = *value;
-              kprintf("Future set: %d\n",*value);
-              f->state=2;
+              
               pid32 temp_pid = deq(&f->get_queue);
               resume(temp_pid);
               resched();
-          }
+          
         }
+        restore(mask);
+        return OK;
         break;
        
       /*case FUTURE_QUEUE:
@@ -110,6 +106,7 @@ syscall future_set(future *f, int *value){
           enq(&f->set_queue, currpid);
           suspend(currpid);
           resched();
+          f->value = *value;
         }
         else
         {

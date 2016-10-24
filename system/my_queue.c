@@ -31,7 +31,7 @@ pid32 first_id(queue *q)
 
 syscall enq(queue *q, pid32 pid)
 {
-  printf("Enqueue begin... head:%d  tail:%d\n",q->head,q->tail);
+  //printf("Enqueue begin... head:%d  tail:%d\n",q->head,q->tail);
   if(q->tail == Q_MAX_COUNT)
   {
     return SYSERR;
@@ -40,7 +40,7 @@ syscall enq(queue *q, pid32 pid)
   q->qu[q->tail] = pid;
   q->tail++;
   
-  printf("Enqueue end... head:%d  tail:%d\n",q->head,q->tail);
+  //printf("Enqueue end... head:%d  tail:%d\n",q->head,q->tail);
   return OK;
 }
 
@@ -56,7 +56,7 @@ pid32 deq(queue *q)
   pid32 pid = q->qu[q->head];
   q->head++;
   
-  printf("Dequeue... head:%d  tail:%d\n",q->head,q->tail);
+  //printf("Dequeue... head:%d  tail:%d\n",q->head,q->tail);
   return pid;
 }
 

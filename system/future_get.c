@@ -81,38 +81,26 @@ syscall future_get(future *f, int *value){
    
        if(is_empty(&f->set_queue))
         {
-          kprintf("\n If nothing in setq");
-          f->state=1;
+          
           enq(&f->get_queue, currpid);
           suspend(currpid);
           resched();
           *value = f->value;
-          f->state=0;
+         
         }
         else
         {
-          if(f->state==2)
-          {
-            kprintf("\n If something in setq and state is valid");
-            f->state=1;
-            enq(&f->get_queue, currpid);
-            suspend(currpid);
-            resched();
-            *value = f->value;
-            f->state=0;
-          }
-          else
-          {
-            kprintf("\n If something in setq and state != Valid");
+          
+          
             pid32 temp_pid = deq(&f->set_queue);
             resume(temp_pid);
-            //resched();
-            sleep(2);
-            printf("\n Get the value !!");
+            
             *value = f->value;
-            f->state=0;
-          }
+            
+          
         }
+        restore(mask);
+        return OK;
         break;
         
           
@@ -124,6 +112,7 @@ syscall future_get(future *f, int *value){
           enq(&f->get_queue, currpid);
           suspend(currpid);
           resched();
+          *value = f->value;
         }
         else
         {

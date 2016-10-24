@@ -11,8 +11,8 @@ uint future_cons(future *fut){
     return -1;
   }
 
-  printf("Process id: %d consumed: %d\n",currpid, i);
-  
+  //printf("Process id: %d consumed: %d\n",currpid, i);
+  printf("it produced %d\n", i);
   
   //future_free(&fut);
 
