@@ -1,7 +1,5 @@
 #include <future.h>
-#include <xinu.h>
-#include <kernel.h>
-#include <prodcons.h>
+
 
 uint future_prod(future *fut){
   int i, j;
@@ -11,7 +9,7 @@ uint future_prod(future *fut){
     j += i;
   }
 
-  printf("\n Produced value %d \n", j);
+  //printf("\n Process id:%d Produced value %d \n",currpid, j);
   future_set(fut, &j);
 
   return OK;

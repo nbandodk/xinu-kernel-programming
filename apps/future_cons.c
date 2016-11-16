@@ -1,7 +1,5 @@
 #include <future.h>
-#include <kernel.h>
-#include <xinu.h>
-#include <prodcons.h>
+
 
 uint future_cons(future *fut){
 
@@ -13,8 +11,10 @@ uint future_cons(future *fut){
     return -1;
   }
 
-  printf(" It produced %d\n", i);
-  future_free(fut);
+  //printf("Process id: %d consumed: %d\n",currpid, i);
+  printf("it produced %d\n", i);
+  
+  //future_free(&fut);
 
   return OK;
 }
