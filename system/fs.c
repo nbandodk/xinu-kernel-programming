@@ -34,6 +34,27 @@ int fs_fileblock_to_diskblock(int dev, int fd, int fileblock);
 
 /* YOUR CODE GOES HERE */
 
+int fs_create(char *filename, int mode)
+{
+  
+
+}
+
+
+
+int fs_open(char *filename, int flags)
+{
+
+}
+
+
+
+
+
+
+
+
+
 int fs_fileblock_to_diskblock(int dev, int fd, int fileblock) {
   int diskblock;
 
