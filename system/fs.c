@@ -26,9 +26,12 @@ struct filetable oft[NUM_FD];
 int next_open_fd = 0;
 
 
+
 #define INODES_PER_BLOCK (fsd.blocksz / sizeof(struct inode))
 #define NUM_INODE_BLOCKS (( (fsd.ninodes % INODES_PER_BLOCK) == 0) ? fsd.ninodes / INODES_PER_BLOCK : (fsd.ninodes / INODES_PER_BLOCK) + 1)
 #define FIRST_INODE_BLOCK 2
+
+int inode_id = 1;
 
 int fs_fileblock_to_diskblock(int dev, int fd, int fileblock);
 
@@ -47,9 +50,137 @@ int fs_open(char *filename, int flags)
 
 }
 
+int find_free_block()
+{
+  int i;
+  for(i = 0; i < fsd.nblocks; i++)
+  {
+    if(fs_getmaskbit(i) == 0)
+    {
+      return i;
+    }
+  }
+  printf("Cannot find free block. \n");
+  return -1;
+}
+  
+int fs_read(int fd, void *buf, int nbytes)
+{
+  int originalbytes = nbytes;
+  
+  
+  if(oft[fd].state == 0)
+  {
+    printf("File descriptor is closed.\n");
+    return 0;
+  }
+  
+  int start_inode_blk = ((oft[fd].fileptr) / fsd.blocksz);
+  int block_offset = ((oft[fd].fileptr) % fsd.blocksz);
+  
+  if(start_inode_blk < INODEBLOCKS)
+  {
+    int dest_blk = oft[fd].in.blocks[start_inode_blk];
+    
+    while(nbytes > 0)
+    {
+      //the data to be read is all in one block
+      if(nbytes < (fsd.blocksz - block_offset))
+      {
+        bs_bread(0, dest_blk, block_offset, buf, nbytes);
+        
+        oft[fd].fileptr += nbytes;
+        buf += nbytes;
+        nbytes = 0;
+        return originalbytes;
+      }
+      else
+      {
+        if(start_inode_blk == INODEBLOCKS - 1)
+        {
+          printf("Reading only the maximum limit of number of bytes to read.\n");
+          return original_bytes - nbytes;
+        }
+        
+        bs_bread(0, dest_blk, block_offset, buf, fsd.blocksz - block_offset);
+        buf += (fsd.blocksz - block_offset);
+        nbytes -= (fsd.blocksz - block_offset);
+        oft[fd].fileptr += (fsd.blocksz - block_offset);
+        
+        start_inode_block++;
+        dest_blk = oft[fd].in.blocks[start_inode_blk];
+        block_offset = 0;
+      }
+    }
+  }
+  
+  return originalbytes - nybtes;
+}
 
-
-
+int fs_write(int fd, void *buf, int nbytes)
+{
+  int originalbytes = nbytes;
+  
+  if(oft[fd].state == 0)
+  {
+    printf("File descriptor is closed.\n");
+    return 0;
+  }
+  
+  int start_inode_blk = ((oft[fd].fileptr) / fsd.blocksz);
+  int block_offset = ((oft[fd].fileptr) % fsd.blocksz);
+  
+  if(start_inode_blk < INODEBLOCKS)
+  {
+    int dest_blk;
+    
+    while(nbytes > 0)
+    {
+      if(oft[fd].in.blocks[start_inode_blk] == 0)
+      {
+        dest_blk = find_free_block();
+        memcpy(oft[fd].in.blocks+start_inode_blk, &dest_blk, sizeof(int));
+        
+        fs_put_inode_by_num(0, oft[fd].in.id, &(oft[fd].in));
+        fs_setmaskbit(dest_blk);
+      }
+      else
+      {
+        dest_blk = oft[fd].in.blocks[start_inode_blk];
+      }
+      
+      //if all the bytes can be written to the same block
+      if(nbytes < (fsd.blocksz - block_offset))
+      {
+        bs_bwrite(0, dest_blk, block_offset, buf, nbytes);
+        oft[fd].fileptr += nbytes;
+        nbytes = 0;
+        return originalbytes;
+      }
+      else
+      {
+        if(start_inode_blk == INODEBLOCKS - 1)
+        {
+          printf("Writing only the maximum limit of number of bytes allowed.\n");
+          return original_bytes - nbytes;
+        }
+        
+        bs_bwrite(0, dest_blk, block_offset, buf, fsd.blocksz - block_offset);
+        
+        buf += (fsd.blocksz - block_offset);
+        nbytes -= (fsd.blocksz - block_offset);
+        oft[fd].fileptr += (fsd.blocksz - block_offset);
+        
+        start_inode_blk++;
+        block_offset = 0;
+      }
+    }
+  }
+  
+  return originalbytes - nbytes;
+}
+  
+  
 
 
 
