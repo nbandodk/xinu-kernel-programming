@@ -82,7 +82,7 @@ void testbitmask(void);
     
     //read the file 
     rval = fs_read(fd, buf2, rval);
-    buf2[rval] = EOF; // TODO: Write end of file symbol i.e. slash-zero instead of EOF. I can not do this because of WIKI editor limitation    
+    buf2[rval] = '\0'; // TODO: Write end of file symbol i.e. slash-zero instead of EOF. I can not do this because of WIKI editor limitation    
 
     if(rval == 0)
     {
@@ -90,7 +90,7 @@ void testbitmask(void);
         goto clean_up;
     }
         
-    printf("\n\rContent of file %s",buf2);
+    printf("\n\rContent of file:\n %s \n",buf2);
     
     rval = fs_close(fd);
     if(rval != OK)

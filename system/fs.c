@@ -31,7 +31,7 @@ int inode_num = 1;
 #define NUM_INODE_BLOCKS (( (fsd.ninodes % INODES_PER_BLOCK) == 0) ? fsd.ninodes / INODES_PER_BLOCK : (fsd.ninodes / INODES_PER_BLOCK) + 1)
 #define FIRST_INODE_BLOCK 2
 
-int inode_id = 1;
+
 
 int fs_fileblock_to_diskblock(int dev, int fd, int fileblock);
 
@@ -43,81 +43,85 @@ int fs_fileblock_to_diskblock(int dev, int fd, int fileblock);
 
 int fs_create(char *filename, int mode)
 {
-    if(mode==O_CREAT){
-        //get root dir:
-        struct directory dir=fsd.root_dir;
-        //check if file name is valid. i.e., no file with same name exists
+    
+        //check if file already exists
         int i;
         
-        for(i=0;i<fsd.root_dir.numentries;i++){
+        for(i = 0; i < fsd.root_dir.numentries; i++)
+        {
             if(strcmp(filename, fsd.root_dir.entry[i].name) == 0)
             {
-                kprintf("File already exists.\n\r");
+                printf("File already exists.\n");
                 return SYSERR;
             }
         }
-        //request entry in filetable:
-        
-        int fd = next_open_fd;
-        struct filetable ft;
-        
-        oft[next_open_fd].state=FSTATE_OPEN;
-        oft[next_open_fd].fileptr=0;
-        oft[next_open_fd].de=&(fsd.root_dir.entry[fsd.root_dir.numentries++]);       
+                
+        oft[next_open_fd].state = FSTATE_OPEN;
+        oft[next_open_fd].fileptr = 0;
+        oft[next_open_fd].de = &(fsd.root_dir.entry[fsd.root_dir.numentries++]);       
         strcpy((oft[next_open_fd].de)->name, filename); 
-        //memcpy(&(fsd.root_dir),&dir,sizeof(struct directory));
-        //struct inode in;
-        //in.id=inode_num++;
         oft[next_open_fd].in.id = inode_num;
+        oft[next_open_fd].in.device = 0;
+        oft[next_open_fd].in.size = 64;
+        oft[next_open_fd].in.flags = 2;
+        
         fs_put_inode_by_num(0, oft[next_open_fd].in.id, &(oft[next_open_fd].in));
-        int bl = oft[next_open_fd].in.id / INODES_PER_BLOCK;
-        bl += FIRST_INODE_BLOCK;
-        fs_setmaskbit(bl);
-        //memcpy(&(ft.in),&in,sizeof(struct inode));
-        //memcpy(&(ft.de->inode_num),&(in.id),sizeof(int));
-        //memcpy(&(fsd.root_dir.entry[dir.numentries-1].inode_num),&(in.id),sizeof(int));
-        //memcpy(oft+fd,&ft,sizeof(struct filetable));
+        int block = oft[next_open_fd].in.id / INODES_PER_BLOCK;
+        block += FIRST_INODE_BLOCK;
+        fs_setmaskbit(block);
+        
         fsd.inodes_used++;
 	inode_num++;
+	int fd = next_open_fd;
 	next_open_fd++;
         return fd;
+    
+}
+
+
+int fs_open(char *filename, int flags)
+{
+  int i;
+  for(i = 0; i < next_open_fd; i++)
+  {
+    if(strcmp(oft[i].de->name, filename) == 0)
+    {
+      oft[next_open_fd].state = FSTATE_OPEN;
+      return i;
     }
-    else return SYSERR;
+  }
+  printf("File not found. \n");
+  return SYSERR;
 }
 
-
-int fs_open(char *filename, int flags){
- int i;
- for(i=0;i<next_open_fd;i++){
- 	if(strcmp(oft[i].de->name,filename)==0){
-		oft[next_open_fd].state=FSTATE_OPEN;
- 		
-		return i;
-	}
- }
- printf("\n File not found");
- return SYSERR;
+int fs_seek(int fd, int offset)
+{
+  if(oft[fd].fileptr + offset < 0)
+  {
+    printf("offset exceeding file \n");
+    return SYSERR;
+  }
+  else
+  {
+    oft[fd].fileptr += offset;
+    printf("Seek successful. Fileptr is %d\n",oft[fd].fileptr);
+    return OK;
+  }
 }
 
-int fs_seek(int fd, int offset){
- if(oft[fd].fileptr+offset+1 <0){
-	printf("\nInvalid offset");
-	return SYSERR;
- }
- else{
-	 oft[fd].fileptr+=offset+1;
- 	printf("\n Seek successful. File PTR IS NOW %d",oft[fd].fileptr);
- 	return OK;
- }
-}
-
-int fs_close(int fd){
- if(fd>next_open_fd||oft[fd].state==FSTATE_CLOSED)
-	return SYSERR;
- else{
-	oft[fd].state=FSTATE_CLOSED;
-	return OK;
- }
+int fs_close(int fd)
+{
+  
+  if(fd > next_open_fd || fd < 0)
+  {
+    printf("Invalid file descriptor. Can't close file\n");
+    return SYSERR;
+  }
+  else
+  {
+    oft[fd].state = FSTATE_CLOSED;
+    return OK;
+  }
 }
 
 int find_free_block()
@@ -138,8 +142,7 @@ int find_free_block()
 int fs_read(int fd, void *buf, int nbytes)
 {
   int originalbytes = nbytes;
-  
-  
+    
   if(oft[fd].state == 0)
   {
     printf("File descriptor is closed.\n");
@@ -210,7 +213,7 @@ int fs_write(int fd, void *buf, int nbytes)
       if(oft[fd].in.blocks[start_inode_blk] == 0)
       {
         dest_blk = find_free_block();
-        memcpy(oft[fd].in.blocks+start_inode_blk, &dest_blk, sizeof(int));
+        memcpy(&(oft[fd].in.blocks[start_inode_blk]), &dest_blk, sizeof(int));
         
         fs_put_inode_by_num(0, oft[fd].in.id, &(oft[fd].in));
         fs_setmaskbit(dest_blk);
@@ -251,121 +254,6 @@ int fs_write(int fd, void *buf, int nbytes)
   return originalbytes - nbytes;
 }
   
-
-/*
-int fs_read(int fd, void *buf, int nbytes)
-{
-   
-    int orig_nbytes=nbytes;
-    
-    struct filetable ft=oft[fd];
-    if(ft.state==FSTATE_CLOSED){
-        kprintf("Error Invalid descriptor.\n\r");
-        return 0;
-    }
-    struct inode in = ft.in;
-
-    int inodeblk= (ft.fileptr / fsd.blocksz);
-    int inodeoffset=(ft.fileptr % fsd.blocksz);
-    if (inodeblk<INODEBLOCKS){
-        int dst_blk=ft.in.blocks[inodeblk];
-        while(nbytes>0){
-            
-            if(nbytes<(fsd.blocksz-inodeoffset)){
-                bs_bread(0,dst_blk,inodeoffset,buf,nbytes);
-                ft.fileptr+=nbytes;
-                buf+=nbytes;
-                nbytes=0;
-                return orig_nbytes;
-            }
-            else{
-                if(inodeblk==INODEBLOCKS-1){
-                    kprintf("Requested bytes exceeds limit.\n\r");
-                    return orig_nbytes-nbytes;
-                }
-                bs_bread(0,dst_blk,inodeoffset,buf,fsd.blocksz-inodeoffset);
-                buf+=(fsd.blocksz-inodeoffset);
-                nbytes-=(fsd.blocksz-inodeoffset);
-                ft.fileptr+=(fsd.blocksz-inodeoffset);
-          
-                memcpy(oft+fd,&ft,sizeof(struct filetable));
-              
-                dst_blk=in.blocks[++inodeblk];
-                inodeoffset=0;
-            }
-        }
-    }
-    return orig_nbytes-nbytes;
-}
-
-int fs_write(int fd, void *buf, int nbytes)
-{
-    int orig_nbytes=nbytes;
-    
-    struct filetable ft=oft[fd];
-
-    if(ft.state==FSTATE_CLOSED){
-        kprintf("Error %d. Invalid descriptor.\n\r",ft.state);
-        return 0;
-    }
-    struct inode in = ft.in;
-    
-    int inodeblk= (ft.fileptr / fsd.blocksz);
-    int inodeoffset=(ft.fileptr % fsd.blocksz);
-    if (inodeblk<INODEBLOCKS){
-        int dst_blk;
-        while(nbytes>0){
-
-            if(in.blocks[inodeblk]==0){
-                //alloc new block
-                dst_blk=find_free_block();
-                memcpy(in.blocks+inodeblk,&dst_blk,sizeof(int));
-
-                //copy in back to ft.in:
-                memcpy(&((oft+fd)->in),&(in),sizeof(struct inode));
-                ft.in=in;
-                
-                fs_put_inode_by_num(0,in.id,&in);
-
-                //mark that block 
-                fs_setmaskbit(dst_blk);
-            }
-            else if(in.blocks[inodeblk]>0){
-                dst_blk=in.blocks[inodeblk]; 
-            }
-            //Check if all data we want to write can be put in same block
-            if(nbytes<(fsd.blocksz-inodeoffset)){
-                bs_bwrite(0,dst_blk,inodeoffset,buf,nbytes);
-                //incr fileptr:
-                ft.fileptr+=nbytes;
-                nbytes=0;
-                //write to oft:
-                memcpy(oft+fd,&ft,sizeof(struct filetable));
-                return orig_nbytes;
-            }
-            else{
-                if(inodeblk==INODEBLOCKS-1){
-                    kprintf("\nRequested bytes exceeds limit.\n\r");
-                    return orig_nbytes-nbytes;
-                }
-                bs_bwrite(0,dst_blk,inodeoffset,buf,fsd.blocksz-inodeoffset);
-                buf+=(fsd.blocksz-inodeoffset);
-                nbytes-=(fsd.blocksz-inodeoffset);
-                ft.fileptr+=(fsd.blocksz-inodeoffset);
-                //write to oft:
-                memcpy(oft+fd,&ft,sizeof(struct filetable));
-    
-                inodeblk++;
-                inodeoffset=0;
-            }
-        }
-    }
-    return orig_nbytes-nbytes;
-}  
-
-*/
-
-
 
 int fs_fileblock_to_diskblock(int dev, int fd, int fileblock) {
   int diskblock;
