@@ -43,51 +43,53 @@ int fs_fileblock_to_diskblock(int dev, int fd, int fileblock);
 
 int fs_create(char *filename, int mode)
 {
-    
-        //check if file already exists
-        int i;
+  //check if file already exists
+  int i;
         
-        for(i = 0; i < fsd.root_dir.numentries; i++)
-        {
-            if(strcmp(filename, fsd.root_dir.entry[i].name) == 0)
-            {
-                printf("File already exists.\n");
-                return SYSERR;
-            }
-        }
+  for(i = 0; i < fsd.root_dir.numentries; i++)
+  {
+    if(strcmp(filename, fsd.root_dir.entry[i].name) == 0)
+    {
+      printf("File already exists.\n");
+      return SYSERR;
+    }
+  }
                 
-        oft[next_open_fd].state = FSTATE_OPEN;
-        oft[next_open_fd].fileptr = 0;
-        oft[next_open_fd].de = &(fsd.root_dir.entry[fsd.root_dir.numentries++]);       
-        strcpy((oft[next_open_fd].de)->name, filename); 
-        oft[next_open_fd].in.id = inode_num;
-        oft[next_open_fd].in.device = 0;
-        oft[next_open_fd].in.size = 64;
-        oft[next_open_fd].in.flags = 2;
+  oft[next_open_fd].state = FSTATE_OPEN;
+  oft[next_open_fd].fileptr = 0;
+  oft[next_open_fd].de = &(fsd.root_dir.entry[fsd.root_dir.numentries++]);       
+  strcpy((oft[next_open_fd].de)->name, filename); 
+  oft[next_open_fd].in.id = inode_num;
+  oft[next_open_fd].in.device = 0;
+  oft[next_open_fd].in.size = 64;
+  oft[next_open_fd].in.flags = O_RDWR;
         
-        fs_put_inode_by_num(0, oft[next_open_fd].in.id, &(oft[next_open_fd].in));
-        int block = oft[next_open_fd].in.id / INODES_PER_BLOCK;
-        block += FIRST_INODE_BLOCK;
-        fs_setmaskbit(block);
+  fs_put_inode_by_num(0, oft[next_open_fd].in.id, &(oft[next_open_fd].in));
+  int block = inode_num / INODES_PER_BLOCK;
+  block += FIRST_INODE_BLOCK;
+  fs_setmaskbit(block);
         
-        fsd.inodes_used++;
-	inode_num++;
-	int fd = next_open_fd;
-	next_open_fd++;
-        return fd;
+  fsd.inodes_used++;
+  inode_num++;
+  int fd = next_open_fd;
+  next_open_fd++;
+  return fd;
     
 }
 
 
 int fs_open(char *filename, int flags)
 {
-  int i;
-  for(i = 0; i < next_open_fd; i++)
+  int i, fd;
+  for(i = 0; i < fsd.root_dir.numentries; i++)
   {
-    if(strcmp(oft[i].de->name, filename) == 0)
+    if(strcmp(filename, fsd.root_dir.entry[i].name) == 0)
     {
+      oft[next_open_fd].de = &(fsd.root_dir.entry[i]);
       oft[next_open_fd].state = FSTATE_OPEN;
-      return i;
+      fd = next_open_fd;
+      next_open_fd++;
+      return fd;
     }
   }
   printf("File not found. \n");
@@ -195,7 +197,7 @@ int fs_write(int fd, void *buf, int nbytes)
 {
   int originalbytes = nbytes;
   
-  if(oft[fd].state == 0)
+  if(oft[fd].state == FSTATE_CLOSED)
   {
     printf("File descriptor is closed.\n");
     return 0;

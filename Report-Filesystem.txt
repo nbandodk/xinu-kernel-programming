@@ -1,0 +1,8 @@
+Implemented filesystem for xinu with following functions:
+
+->fs_read - reads given number of bytes from file (Ninad Bandodkar)
+->fs_write - writes given number of bytes to a file (Ninad Bandodkar)
+->fs_open - locate and open a file and return its file descriptor (Ninad Bandodkar)
+->fs_close - close the file (Omkar Bhide)
+->fs_seek - seek to a particular offset in the file (Omkar Bhide)
+->fs_create - create the file in the directory (Omkar Bhide)
