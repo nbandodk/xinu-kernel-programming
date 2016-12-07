@@ -1,7 +1,7 @@
 #include <future.h>
 
 uint network_cons(future *fut) {
-  int j, status;
+  int i, status;
   
   status = future_get(fut, &i);
   

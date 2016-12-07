@@ -35,7 +35,7 @@ void	clkhandler()
 		count1000 = 1000;
 		
 		for(slot = 0;slot < ARP_SIZ; slot++) {
-			if(clktime - (arpcache[slot].arptime) > 300)
+			if(clktime - (arpcache[slot].artime) > 300)
 				arpcache[slot].arstate = AR_FREE;
 		}
 	}

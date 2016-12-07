@@ -8,7 +8,8 @@
 /* Table of Xinu shell commands and the function associated with each	*/
 /************************************************************************/
 const	struct	cmdent	cmdtab[] = {
-	{"futuresnettest", FALSE, xsh_futuresnettest},
+	{"nettest", FALSE, xsh_nettest},
+	{"networkfutures", FALSE, xsh_networkfutures},
 	{"fstest", FALSE, xsh_fstest},
 	{"prodcons", FALSE, xsh_prodcons},
 	{"hello", FALSE, xsh_hello},

@@ -1,5 +1,8 @@
+/* in file xsh_nettest.c */
+extern shellcmd xsh_nettest(int32, char *[]);
+
 /* in file xsh_futuresnettest.c */
-extern shellcmd xsh_futuresnettest(int32, char *[]);
+extern shellcmd xsh_networkfutures(int32, char *[]);
 
 /* in file xsh_fstest.c */
 extern shellcmd xsh_fstest(int32, char *[]);
