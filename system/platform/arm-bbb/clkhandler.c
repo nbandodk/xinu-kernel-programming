@@ -9,6 +9,7 @@
 void	clkhandler()
 {
 
+	int32 slot;
 	static uint32 count1000 = 1000;	/* variable to count 1000ms */
 	volatile struct am335x_timer1ms *csrptr = (struct am335x_timer1ms *)0x44E31000;
 					/* Pointer to timer CSR	    */
@@ -32,6 +33,11 @@ void	clkhandler()
 	if(count1000 == 0) {
 		clktime++;
 		count1000 = 1000;
+		
+		for(slot = 0;slot < ARP_SIZ; slot++) {
+			if(clktime - (arpcache[slot].arptime) > 300)
+				arpcache[slot].arstate = AR_FREE;
+		}
 	}
 
 	/* check if sleep queue is empty */
