@@ -1,3 +1,5 @@
+/* in file xsh_futuresnettest.c */
+extern shellcmd xsh_futuresnettest(int32, char *[]);
 
 /* in file xsh_fstest.c */
 extern shellcmd xsh_fstest(int32, char *[]);

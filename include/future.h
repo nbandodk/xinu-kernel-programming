@@ -32,5 +32,8 @@ syscall future_set(future*, int*);
 uint future_prod(future *);
 uint future_cons(future *);
 
+uint network_prod(future *, int32);
+uint network_cons(future *);
+
 #endif /* _FUTURE_H_ */
 
