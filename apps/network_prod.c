@@ -10,7 +10,7 @@ uint network_prod(future *fut, int32 slot) {
     return -1;
   }
   else {
-    printf("Value received: %s\n", buf);
+    printf("Value received: %s .... Now setting the future\n", buf);
     j = atoi(buf);
     future_set(fut, &j);
     return OK;
@@ -29,5 +29,5 @@ uint network_prod(future *fut, int32 slot) {
     j = atoi(buf);
     future_set(fut, &j);
     return OK;
-  }
+  } while(nbytes > 0);
   */

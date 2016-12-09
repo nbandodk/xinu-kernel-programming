@@ -10,6 +10,6 @@ uint network_cons(future *fut) {
     return -1;
   }
   
-  printf("it produced %d\n", i);
+  printf("In network consumer ...... it produced %d\n", i);
   
 }
