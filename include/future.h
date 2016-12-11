@@ -33,7 +33,7 @@ uint future_prod(future *);
 uint future_cons(future *);
 
 uint network_prod(future *, int32);
-uint network_cons(future *);
+uint network_cons(future *, int32);
 
 #endif /* _FUTURE_H_ */
 

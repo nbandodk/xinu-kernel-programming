@@ -1,6 +1,6 @@
 #include <future.h>
 
-uint network_cons(future *fut) {
+uint network_cons(future *fut, int32 slot) {
   int i, status;
   
   status = future_get(fut, &i);
@@ -11,5 +11,7 @@ uint network_cons(future *fut) {
   }
   
   printf("In network consumer ...... it produced %d\n", i);
+  char ack_m[] = "Network consumer has consumed the value successfully.";
+  udp_send(slot, ack_m, strlen(ack_m));
   
 }
